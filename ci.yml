@@ -1,0 +1,31 @@
+name: Trivy Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  trivy_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout Code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Trivy
+      - name: Set up Trivy
+        run: |
+          sudo apt-get update && sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.44.2_Linux-64bit.deb
+          sudo dpkg -i trivy_0.44.2_Linux-64bit.deb
+
+      # Trivy Scan: Docker Image
+      - name: Scan Docker Image
+        run: trivy image nginx:latest
+
+      # Trivy Scan: Filesystem
+      - name: Scan Filesystem
+        run: trivy fs .
+
